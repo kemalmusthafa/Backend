@@ -4,8 +4,10 @@ import { Prisma } from "@prisma/client";
 
 export class UserController {
   async getUsers(req: Request, res: Response) {
+    console.log(req.user);
     try {
       const { search, page = 1, limit = 5 } = req.query;
+      const { user } = req.body;
       const filter: Prisma.UserWhereInput = {};
       if (search) {
         //filter .username = {contains: search as string}
@@ -30,8 +32,9 @@ export class UserController {
   }
   async getUsersId(req: Request, res: Response) {
     try {
-      const { id } = req.params;
-      const user = await prisma.user.findUnique({ where: { id: +id } });
+      const user = await prisma.user.findUnique({
+        where: { id: req.user?.id },
+      });
       res.status(200).send({ user });
     } catch (err) {
       console.log(err);
