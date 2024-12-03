@@ -8,11 +8,12 @@ export const verifyToken = async (
   next: NextFunction
 ) => {
   try {
-    const token = req.header("Authorization")?.replace("Bearer ", "");
+    // const token = req.header("Authorization")?.replace("Bearer ", "");
+    const token = req.cookies?.token; // kalo sudah pakai cookies
     if (!token) throw "Unauthorize!";
 
     const verifiedUser = verify(token, process.env.JWT_KEY!);
-    req.user = verifiedUser as UserPayload
+    req.user = verifiedUser as UserPayload;
 
     next();
   } catch (err) {
@@ -21,16 +22,10 @@ export const verifyToken = async (
   }
 };
 
-export const checkAdmin = (
-    req: Request,
-    res: Response,
-    next: NextFunction
-) => {
-    if (req.user?.role == "Admin") {
-        next();
-    } else {
-        res.status(400).send("Admin Only!");
-    }
+export const checkAdmin = (req: Request, res: Response, next: NextFunction) => {
+  if (req.user?.role == "Admin") {
+    next();
+  } else {
+    res.status(400).send({ message: "Unauthorize, Admin Only!" });
+  }
 };
-
-
